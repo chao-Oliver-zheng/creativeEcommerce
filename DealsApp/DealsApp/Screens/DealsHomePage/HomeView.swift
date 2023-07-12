@@ -8,29 +8,54 @@
 import SwiftUI
 
 struct HomeView: View {
+    
     @StateObject var viewModel =  HomeViewModel()
     let horizontalSpacing: CGFloat = 20
+    @State private var searchText = ""
+    @State private var path = NavigationPath()
+    
     var body: some View {
-        VStack{
-            HeaderView()
-            ScrollView{
-                LazyVGrid(columns: [
-                    GridItem(.flexible(), spacing: horizontalSpacing),
-                    GridItem(.flexible())
-                ], spacing: 16){
-                    ForEach(viewModel.deals, id: \.self){ item in
-                        NavigationLink(destination: DetailView(items: item)){
-                            ItemCell(items: item)
+        
+        NavigationStack(path: $path) {
+           
+            VStack(alignment: .center){
+                Text("Deal's Store")
+                    .font(.system(size: 25))
+                    .bold()
+                TextField("Search your product", text: $searchText)
+                    .textFieldStyle(SearchTextFieldStyle())
+                List {
+                        ForEach(filteredData, id: \.self){ item in
+                            ZStack{
+                                NavigationLink(value: item) {
+                                    ItemCell(items: item)
+                                }
+                                .opacity(0)
+                                ItemCell(items: item)
+                                
+                            }
                         }
+                        .listRowSeparator(.hidden)
+                        .background(Color.cyan)
+                        .cornerRadius(15)
                     }
+                    .listStyle(.plain)
+                    .edgesIgnoringSafeArea(.all)
+                    .navigationDestination(for: Deal.self) { item in
+                        DetailView(items: item, viewModel: viewModel, path: $path)
+                    }
+                    
                 }
-                .onAppear{viewModel.getData()}
-                .padding(.horizontal)
+ 
             }
+            .onAppear{ viewModel.getData() }
         }
-        .background(Color(red: 0.85, green: 0.85, blue: 0.8))
-        
-        
+    private var filteredData: [Deal] {
+        if searchText.isEmpty {
+            return viewModel.deals
+        } else {
+            return viewModel.deals.filter { $0.title.lowercased().contains(searchText.lowercased()) }
+        }
     }
 }
 

@@ -4,7 +4,7 @@
 //
 //  Created by Oliver Zheng on 7/5/23.
 //
-
+/*
 import SwiftUI
 
 struct FirstPageView: View {
@@ -97,3 +97,4 @@ struct FirstPageViewView_Previews: PreviewProvider {
         FirstPageView()
     }
 }
+*/
